@@ -11,33 +11,41 @@ client = MongoClient("mongodb://mongo:27017")
 db = client["mydatabase"]
 
 # collection instance
-customers = db["customers"]
+todos = db["Todos"]
 
 
-# API endpoint to get customer data
-@app.route('/customers', methods=['GET'])
-def get_customers():
-    customer_data = []
-    for customer in customers.find():
-        customer_data.append({
-            "id": str(customer["_id"]),
-            "name": customer["name"],
-            "age": customer["age"],
-            "address": customer["address"]
+# API endpoint to get todos data
+@app.route('/todos', methods=['GET'])
+def get_todos():
+    todos_data = []
+    for todo_element in todos.find():
+        todos_data.append({
+            "id": str(todo_element["_id"]),
+            "name": todo_element["name"],
+            "description": todo_element["description"],
+            "status": todo_element["status"],
+            "tags": todo_element["tags"]
         })
-    return jsonify(customer_data), 200
+    return jsonify(todos_data), 200
 
 
 # API endpoint to add customer data
-@app.route('/customers', methods=['POST'])
-def add_customer():
-    new_customer = {
+@app.route('/todos', methods=['POST'])
+def add_todos():
+    new_todo = {
         "name": request.json["name"],
-        "age": request.json["age"],
-        "address": request.json["address"]
+        "description": request.json["description"],
+        "status": request.json["status"],
+        "tags": request.json["tags"]
     }
-    x = customers.insert_one(new_customer)
+    x = todos.insert_one(new_todo)
     return jsonify({"id": str(x.inserted_id)}), 201
+
+
+# API default endpoint
+@app.route('/', methods=['GET'])
+def default():
+    return "Welcome to the Todo API!"
 
 
 if __name__ == "__main__":
