@@ -10,6 +10,9 @@ A backend for the Todo-App
 - Run `docker-compose up` and the API is available under http://0.0.0.0:5001/ and can be accessed from the frontend
 - Press `Ctrl + C` to stop
 
+**Installations Tutorial:**
+https://www.youtube.com/watch?v=PzgRQEKK3iU
+
 ### General Information
 - A MongoDB Admin-Panel is installed to make interacting with the Database easier 
   - Username: admin
