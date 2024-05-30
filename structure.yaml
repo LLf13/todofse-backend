@@ -1,0 +1,88 @@
+openapi: 3.0.0
+info:
+  title: Todo API
+  description: Very simple API for the Todo project in Fallstudie Softwareengineering
+  version: 0.0.1
+servers:
+  - url: http://0.0.0.0:5000
+    description: internal development. make sure docker compose stack is running
+
+paths:
+  /todos:
+    get:
+      summary: List all todos
+      responses:
+        '200':
+          description: A list of todos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Todo'
+    post:
+      summary: Create a new todo
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Todo'
+        required: true
+      responses:
+        '201':
+          description: Todo created
+
+  /todos/{id}:
+    get:
+      summary: Get a todo by id
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+        '404':
+          description: Todo not found
+
+components:
+  schemas:
+    Todo:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        user_id:
+          type: string
+          required: true
+        title:
+          type: string
+          required: true
+        description:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        due_date:
+          type: string
+          format: date-time
+        completed:
+          type: boolean
+        priority:
+          type: string
+          enum: [Low, Medium, High]
+      required:
+        - user_id
+        - title

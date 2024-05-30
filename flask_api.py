@@ -1,3 +1,6 @@
+from datetime import datetime
+
+from bson import ObjectId
 from flask import Flask, request, jsonify
 from pymongo import MongoClient
 
@@ -17,26 +20,61 @@ todos = db["Todos"]
 # API endpoint to get todos data
 @app.route('/todos', methods=['GET'])
 def get_todos():
-    todos_data = []
-    for todo_element in todos.find():
-        todos_data.append({
-            "id": str(todo_element["_id"]),
-            "name": todo_element["name"],
-            "description": todo_element["description"],
-            "status": todo_element["status"],
-            "tags": todo_element["tags"]
-        })
-    return jsonify(todos_data), 200
+    all_todos = todos.find()
+
+    result = []
+    for todo in all_todos:
+        item = {
+            "id": str(todo['_id']),
+            "user_id": todo['user_id'],
+            "title": todo['title'],
+            "description": todo['description'],
+            "created_at": todo['created_at'].strftime('%Y-%m-%d %H:%M:%S') if todo.get('created_at') else None,
+            "updated_at": todo['updated_at'].strftime('%Y-%m-%d %H:%M:%S') if todo.get('updated_at') else None,
+            "due_date": todo['due_date'].strftime('%Y-%m-%d %H:%M:%S') if todo.get('due_date') else None,
+            "completed": todo['completed'],
+            "priority": todo['priority'],
+        }
+        result.append(item)
+    return jsonify(result), 200
 
 
-# API endpoint to add customer data
+@app.route('/todos/<id>', methods=['GET'])
+def get_todo(_id):
+    todo = todos.find_one({'_id': ObjectId(_id)})
+    if todo:
+        # Do data processing here and return the data
+        return_data = {
+            "id": str(todo.get('_id')),
+            "user_id": todo.get('user_id'),
+            "title": todo.get('title'),
+            "description": todo.get('description'),
+            "created_at": todo.get('created_at').strftime('%Y-%m-%d %H:%M:%S') if todo.get('created_at') else None,
+            "updated_at": todo.get('updated_at').strftime('%Y-%m-%d %H:%M:%S') if todo.get('updated_at') else None,
+            "due_date": todo.get('due_date').strftime('%Y-%m-%d %H:%M:%S') if todo.get('due_date') else None,
+            "completed": todo.get('completed'),
+            "priority": todo.get('priority'),
+        }
+        return jsonify(return_data), 200
+    else:
+        # Return not found if no Todo_element with that ID is found
+        return jsonify({'error': 'Todo not found'}), 404
+
+
+# API endpoint to add todos
 @app.route('/todos', methods=['POST'])
-def add_todos():
+def add_todo():
+    data = request.get_json()
     new_todo = {
-        "name": request.json["name"],
-        "description": request.json["description"],
-        "status": request.json["status"],
-        "tags": request.json["tags"]
+        'user_id': data.get('user_id'),  # Get user_id from the request data
+        'title': data.get('title'),
+        'description': data.get('description', ''),  # Default to empty string if no description provided
+        'created_at': datetime.now(),
+        'updated_at': datetime.now(),
+        'due_date': datetime.strptime(data.get('due_date'), '%Y-%m-%d') if data.get('due_date') else None,
+        # Convert string date to datetime
+        'completed': data.get('completed', False),  # Default to False if no completion status provided
+        'priority': data.get('priority', 'Medium'),  # Default to Medium if no priority level provided
     }
     x = todos.insert_one(new_todo)
     return jsonify({"id": str(x.inserted_id)}), 201
