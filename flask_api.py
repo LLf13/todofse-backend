@@ -1,18 +1,31 @@
 from datetime import datetime
 
 from bson import ObjectId
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, g
 from pymongo import MongoClient
 
+from flask_user_management import user_management, login_manager, bcrypt
+
+
 # create a new Flask application
-app = Flask(__name__)
 
-# create a MongoClient instance to connect to the MongoDB server
-client = MongoClient("mongodb://mongo:27017")
+def create_app():
+    app = Flask(__name__)
+    app.register_blueprint(user_management)
+    login_manager.init_app(app)
+    bcrypt.init_app(app)
+    return app
 
-# database instance
-db = client["mydatabase"]
 
+def get_db():
+    if 'db' not in g:
+        g.db = MongoClient("mongodb://mongo:27017").get_database("mydatabase")
+        return g.db
+
+
+app = create_app()
+
+db = get_db()
 # collection instance
 todos = db["Todos"]
 
@@ -84,6 +97,13 @@ def add_todo():
 @app.route('/', methods=['GET'])
 def default():
     return "Welcome to the Todo API!"
+
+
+@app.teardown_appcontext
+def close_db(e=None):
+    db = g.pop('db', None)
+    if db is not None:
+        db.close()
 
 
 if __name__ == "__main__":

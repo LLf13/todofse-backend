@@ -17,5 +17,5 @@ https://www.youtube.com/watch?v=PzgRQEKK3iU
 - A MongoDB Admin-Panel is installed to make interacting with the Database easier 
   - Username: admin
   - Password: pass
-- I didn't have time to make a proper API documentation, If you want to know how the API works take a look at the flask_api.py file
+- Checkout `structure.yaml` for proper API documentation
 
