@@ -17,5 +17,5 @@ https://www.youtube.com/watch?v=PzgRQEKK3iU
 - A MongoDB Admin-Panel is installed to make interacting with the Database easier 
   - Username: admin
   - Password: pass
-- Checkout `structure.yaml` for proper API documentation
+- Checkout https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/LLf13/todofse-backend/main/structure.yaml#/paths/~1todos~1%7Bid%7D/get for properly rendered API docs
 
